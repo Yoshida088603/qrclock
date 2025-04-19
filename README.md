@@ -2,6 +2,8 @@
 
 QRコードを使用してGPS時刻を表示・共有するWebアプリケーション。
 
+[デモを見る](https://[username].github.io/qrclock/)
+
 ## 機能
 
 - UTC時刻の表示（YYYY-MM-DD HH:MM:SS.mmm形式）
@@ -27,9 +29,15 @@ QRコードを使用してGPS時刻を表示・共有するWebアプリケーシ
   - 10fps = 100ms間隔
   - 16fps = 62.5ms間隔
 
-## セットアップ
+## ローカルでの実行
 
-1. ローカルサーバーの起動:
+1. リポジトリをクローン:
+```bash
+git clone https://github.com/[username]/qrclock.git
+cd qrclock
+```
+
+2. ローカルサーバーの起動:
 ```bash
 # Pythonの場合
 python -m http.server 8000
@@ -38,7 +46,7 @@ python -m http.server 8000
 npx serve
 ```
 
-2. ブラウザでアクセス:
+3. ブラウザでアクセス:
 ```
 http://localhost:8000
 ```
