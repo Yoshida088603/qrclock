@@ -14,19 +14,33 @@ body {
     padding: 2rem;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    width: 400px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 #current-time {
-    font-size: 2rem;
-    margin-bottom: 1rem;
+    font-size: 1.5rem;
+    margin-bottom: 2rem;
+    line-height: 1.8;
+    font-family: monospace;
+    white-space: pre;
 }
 
 #qrcode {
     margin: 1rem 0;
+    display: flex;
+    justify-content: center;
+}
+
+#qrcode img {
+    display: block;
+    margin: 0 auto;
 }
 
 #gps-info {
     font-size: 0.9rem;
     color: #666;
-    margin-top: 1rem;
+    margin-top: 1.5rem;
 }

@@ -1,10 +1,16 @@
 class QRClock {
     constructor() {
         this.timeElement = document.getElementById('current-time');
-        this.gpsElement = document.getElementById('gps-info');
         this.qrElement = document.getElementById('qrcode');
-        this.lastPosition = null;
+        this.infoElement = document.getElementById('gps-info');
         
+        // GPS時間の開始時点（1980-01-06T00:00:00Z）
+        this.GPS_EPOCH = new Date('1980-01-06T00:00:00Z').getTime();
+        
+        // 更新間隔（16fps = 62.5ms）
+        this.UPDATE_INTERVAL = 62.5;
+        this.updateTimer = null;
+
         // QRコードの初期設定
         this.qr = new QRCode(this.qrElement, {
             width: 256,
@@ -19,68 +25,54 @@ class QRClock {
 
     init() {
         this.startClock();
-        this.startGPS();
+        this.infoElement.textContent = 'QRコードをスキャンしてGPS時刻を取得できます';
+    }
+
+    formatDateTime(date) {
+        return date.toISOString().replace('T', ' ').slice(0, -1);
+    }
+
+    updateClock() {
+        const now = new Date();
+        const utcTimestamp = now.getTime();
+        
+        // GPS時間（1980年1月6日からの経過ミリ秒）
+        const gpsTime = utcTimestamp - this.GPS_EPOCH;
+
+        // 画面表示
+        this.timeElement.innerHTML = `UTC: ${this.formatDateTime(now)}\nGPS: ${gpsTime}`;
+
+        // QRコードにGPS時間をそのまま含める
+        this.qr.makeCode(gpsTime.toString());
+    }
+
+    setUpdateRate(fps) {
+        // 既存のタイマーをクリア
+        if (this.updateTimer) {
+            clearInterval(this.updateTimer);
+        }
+
+        // fpsを5-16の範囲に制限
+        fps = Math.min(Math.max(fps, 5), 16);
+        this.UPDATE_INTERVAL = 1000 / fps;
+
+        // 新しいタイマーを開始
+        this.updateTimer = setInterval(() => this.updateClock(), this.UPDATE_INTERVAL);
     }
 
     startClock() {
-        const updateClock = () => {
-            const now = new Date();
-            const timeString = now.toISOString();
-            
-            // 現在時刻の表示を更新
-            this.timeElement.textContent = now.toLocaleTimeString('ja-JP', {
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit',
-                fractionalSecondDigits: 3
-            });
-
-            // QRコードデータの作成
-            const qrData = {
-                timestamp: now.getTime(),
-                gps: this.lastPosition
-            };
-
-            // QRコードの更新
-            this.qr.makeCode(JSON.stringify(qrData));
-
-            // 約16.6ms（60fps）ごとに更新
-            requestAnimationFrame(updateClock);
-        };
-
-        updateClock();
-    }
-
-    startGPS() {
-        if ('geolocation' in navigator) {
-            navigator.geolocation.watchPosition(
-                (position) => {
-                    this.lastPosition = {
-                        latitude: position.coords.latitude,
-                        longitude: position.coords.longitude,
-                        accuracy: position.coords.accuracy
-                    };
-                    
-                    // GPS情報の表示を更新
-                    this.gpsElement.textContent = `GPS: ${this.lastPosition.latitude.toFixed(6)}, ${this.lastPosition.longitude.toFixed(6)} (精度: ${this.lastPosition.accuracy.toFixed(1)}m)`;
-                },
-                (error) => {
-                    console.error('GPS error:', error);
-                    this.gpsElement.textContent = 'GPS: 取得できません';
-                },
-                {
-                    enableHighAccuracy: true,
-                    maximumAge: 0,
-                    timeout: 5000
-                }
-            );
-        } else {
-            this.gpsElement.textContent = 'GPS: このブラウザではサポートされていません';
-        }
+        // 初回更新
+        this.updateClock();
+        // 16fpsで開始
+        this.setUpdateRate(16);
     }
 }
 
 // アプリケーションの起動
 document.addEventListener('DOMContentLoaded', () => {
-    new QRClock();
+    const clock = new QRClock();
+    // 必要に応じてレートを変更可能
+    clock.setUpdateRate(5);  // 5fps (200ms間隔)
+    clock.setUpdateRate(10); // 10fps (100ms間隔)
+    clock.setUpdateRate(16); // 16fps (62.5ms間隔)
 });
