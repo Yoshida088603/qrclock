@@ -1,0 +1,32 @@
+body {
+    font-family: 'Arial', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    background-color: #f0f0f0;
+}
+
+.container {
+    text-align: center;
+    background: white;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+#current-time {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+#qrcode {
+    margin: 1rem 0;
+}
+
+#gps-info {
+    font-size: 0.9rem;
+    color: #666;
+    margin-top: 1rem;
+}
